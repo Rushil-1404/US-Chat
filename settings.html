@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    .bg-wa-green {
+      background-color: #25d366;
+    }
+
+    .text-wa-green {
+      color: #25d366;
+    }
+
+    .switch-toggle:checked + label {
+      background-color: #25d366;
+    }
+
+    .switch-toggle:checked + label::after {
+      transform: translateX(20px);
+    }
+  </style>
+</head>
+<body>
+  <div class="w-full h-screen flex flex-col bg-gray-50">
+    <header class="shrink-0 pt-14 bg-white border-b border-gray-100 z-20 shadow-sm">
+      <div class="flex items-center gap-4 px-4 pb-4">
+        <a href="https://p.superdesign.dev/draft/000ccec3-e382-4c4d-ae00-8975daeef105" id="back-to-chats" class="w-10 h-10 flex items-center justify-center text-gray-700 active:bg-gray-100 rounded-full transition-colors">
+          <iconify-icon icon="lucide:arrow-left" width="24"></iconify-icon>
+        </a>
+        <h1 class="text-xl font-bold text-gray-900">Settings</h1>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto pb-6">
+      <div class="px-4 py-6 bg-white border-b border-gray-100 flex items-center gap-4 mb-4 active:bg-gray-50 transition-colors">
+        <div class="w-16 h-16 rounded-full bg-wa-green flex items-center justify-center text-white font-bold text-2xl overflow-hidden shrink-0">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=160" alt="Profile" class="w-full h-full object-cover">
+        </div>
+        <div class="flex-1 min-w-0">
+          <h2 class="text-[18px] font-bold text-gray-900 truncate">Rushil Patil</h2>
+          <p class="text-[14px] text-gray-500 truncate">Life is what happens when you're busy making other plans.</p>
+        </div>
+        <button class="text-wa-green p-2">
+          <iconify-icon icon="lucide:qr-code" width="24"></iconify-icon>
+        </button>
+      </div>
+
+      <div class="space-y-6 pb-8">
+        <section>
+          <h3 class="px-6 mb-2 text-[12px] font-bold text-gray-400 uppercase tracking-widest">Account &amp; Security</h3>
+          <div class="bg-white border-y border-gray-100 divide-y divide-gray-50">
+            <div class="flex items-center gap-4 px-6 py-4 active:bg-gray-50 transition-colors">
+              <iconify-icon icon="lucide:key-round" class="text-gray-400" width="22"></iconify-icon>
+              <div class="flex-1">
+                <span class="text-[15px] font-medium text-gray-800">Account</span>
+                <p class="text-[12px] text-gray-500">Privacy, security, change number</p>
+              </div>
+              <iconify-icon icon="lucide:chevron-right" class="text-gray-300" width="20"></iconify-icon>
+            </div>
+            <div class="flex items-center gap-4 px-6 py-4 active:bg-gray-50 transition-colors">
+              <iconify-icon icon="lucide:lock" class="text-gray-400" width="22"></iconify-icon>
+              <div class="flex-1">
+                <span class="text-[15px] font-medium text-gray-800">Privacy</span>
+                <p class="text-[12px] text-gray-500">Last seen, profile photo, groups</p>
+              </div>
+              <iconify-icon icon="lucide:chevron-right" class="text-gray-300" width="20"></iconify-icon>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 class="px-6 mb-2 text-[12px] font-bold text-gray-400 uppercase tracking-widest">Communications</h3>
+          <div class="bg-white border-y border-gray-100 divide-y divide-gray-50">
+            <div class="flex items-center justify-between px-6 py-4 transition-colors">
+              <div class="flex items-center gap-4">
+                <iconify-icon icon="lucide:bell" class="text-gray-400" width="22"></iconify-icon>
+                <span class="text-[15px] font-medium text-gray-800">Message Notifications</span>
+              </div>
+              <div class="relative inline-block w-12 h-6">
+                <input type="checkbox" id="toggle-notifications" class="switch-toggle sr-only" checked>
+                <label for="toggle-notifications" class="block w-12 h-6 bg-gray-200 rounded-full cursor-pointer transition-colors after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:w-4 after:h-4 after:rounded-full after:transition-transform"></label>
+              </div>
+            </div>
+            <div class="flex items-center justify-between px-6 py-4 transition-colors">
+              <div class="flex items-center gap-4">
+                <iconify-icon icon="lucide:vibrate" class="text-gray-400" width="22"></iconify-icon>
+                <span class="text-[15px] font-medium text-gray-800">Vibrate on Message</span>
+              </div>
+              <div class="relative inline-block w-12 h-6">
+                <input type="checkbox" id="toggle-vibrate" class="switch-toggle sr-only" checked>
+                <label for="toggle-vibrate" class="block w-12 h-6 bg-gray-200 rounded-full cursor-pointer transition-colors after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:w-4 after:h-4 after:rounded-full after:transition-transform"></label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 class="px-6 mb-2 text-[12px] font-bold text-gray-400 uppercase tracking-widest">App Settings</h3>
+          <div class="bg-white border-y border-gray-100 divide-y divide-gray-50">
+            <div class="flex items-center gap-4 px-6 py-4 active:bg-gray-50 transition-colors">
+              <iconify-icon icon="lucide:palette" class="text-gray-400" width="22"></iconify-icon>
+              <div class="flex-1">
+                <span class="text-[15px] font-medium text-gray-800">Theme</span>
+                <p class="text-[12px] text-gray-500">System Default</p>
+              </div>
+              <iconify-icon icon="lucide:chevron-right" class="text-gray-300" width="20"></iconify-icon>
+            </div>
+            <div class="flex items-center gap-4 px-6 py-4 active:bg-gray-50 transition-colors">
+              <iconify-icon icon="lucide:image" class="text-gray-400" width="22"></iconify-icon>
+              <div class="flex-1">
+                <span class="text-[15px] font-medium text-gray-800">Chat Wallpaper</span>
+              </div>
+              <iconify-icon icon="lucide:chevron-right" class="text-gray-300" width="20"></iconify-icon>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 class="px-6 mb-2 text-[12px] font-bold text-gray-400 uppercase tracking-widest">Data and Storage</h3>
+          <div class="bg-white border-y border-gray-100 p-6">
+            <div class="flex items-center gap-4 mb-4">
+              <iconify-icon icon="lucide:database" class="text-wa-green" width="24"></iconify-icon>
+              <div class="flex-1">
+                <div class="flex justify-between items-center text-[14px] font-semibold text-gray-800 mb-2">
+                  <span>Cloud Storage Usage</span>
+                  <span>28%</span>
+                </div>
+                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-wa-green rounded-full w-[28%]"></div>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-2">4.2 GB of 15 GB Used (OneDrive)</p>
+              </div>
+            </div>
+            <a href="https://p.superdesign.dev/draft/d8fb78c9-96dc-4e58-b714-fc1a9c4cc6d3" class="block w-full text-center py-2.5 bg-gray-50 rounded-xl text-[13px] font-semibold text-wa-green hover:bg-gray-100 transition-colors">Manage Storage</a>
+          </div>
+        </section>
+
+        <section class="pt-4 px-6">
+          <a href="https://p.superdesign.dev/draft/fd94130e-78eb-48e4-a45d-45e8e2e43c72" id="nav-logout-action" class="flex items-center justify-center gap-3 w-full h-14 bg-red-50 text-red-600 font-bold rounded-2xl active:scale-95 transition-all">
+            <iconify-icon icon="lucide:log-out" width="20"></iconify-icon>
+            Logout
+          </a>
+          <p class="text-center text-[12px] text-gray-400 mt-8 mb-4">from NMIMS University</p>
+        </section>
+      </div>
+    </main>
+
+    <footer class="shrink-0 pb-[34px] bg-white border-t border-gray-100 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] z-30">
+      <div class="flex justify-around items-center h-16">
+        <a href="https://p.superdesign.dev/draft/000ccec3-e382-4c4d-ae00-8975daeef105" id="nav-chats-link" class="flex flex-col items-center gap-1 text-gray-400 hover:text-wa-green transition-colors">
+          <iconify-icon icon="lucide:message-circle" width="24"></iconify-icon>
+          <span class="text-[11px] font-medium">Chats</span>
+        </a>
+        <button id="nav-calls-btn" class="flex flex-col items-center gap-1 text-gray-400 hover:text-wa-green transition-colors">
+          <iconify-icon icon="lucide:phone" width="24"></iconify-icon>
+          <span class="text-[11px] font-medium">Calls</span>
+        </button>
+        <a href="https://p.superdesign.dev/draft/d8fb78c9-96dc-4e58-b714-fc1a9c4cc6d3" id="nav-cloud-link" class="flex flex-col items-center gap-1 text-gray-400 hover:text-wa-green transition-colors">
+          <iconify-icon icon="lucide:cloud" width="24"></iconify-icon>
+          <span class="text-[11px] font-medium">Cloud</span>
+        </a>
+        <a href="https://p.superdesign.dev/draft/222a8fc3-5be2-4119-b279-712560d960a1" id="nav-settings-btn" class="flex flex-col items-center gap-1 text-wa-green">
+          <iconify-icon icon="lucide:settings" width="24"></iconify-icon>
+          <span class="text-[11px] font-medium">Settings</span>
+        </a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

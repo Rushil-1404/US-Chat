@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    .bg-chat-beige {
+      background-color: #dbd8d4;
+    }
+
+    .bg-wa-green {
+      background-color: #25d366;
+    }
+
+    .text-wa-green {
+      color: #25d366;
+    }
+
+    .typing-dot {
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+      0%, 80%, 100% {
+        transform: translateY(0);
+      }
+
+      40% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .message-in {
+      animation: messageIn 0.3s ease-out forwards;
+    }
+
+    @keyframes messageIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .menu-animate {
+      animation: slideDown 0.2s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="w-full h-screen flex flex-col bg-chat-beige">
+    <header class="shrink-0 pt-14 bg-white border-b border-gray-200 z-50">
+      <div class="flex items-center justify-between px-4 pb-3">
+        <a href="https://p.superdesign.dev/draft/000ccec3-e382-4c4d-ae00-8975daeef105" id="header-back-link" class="flex items-center gap-3 min-w-0">
+          <div class="relative w-10 h-10 rounded-full bg-wa-green flex items-center justify-center text-white font-semibold text-lg overflow-hidden shrink-0">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100" alt="Avatar" class="w-full h-full object-cover">
+            <div class="absolute bottom-0 right-0 w-3 h-3 bg-wa-green border-2 border-white rounded-full"></div>
+          </div>
+          <div class="flex flex-col">
+            <h1 class="text-[15px] font-semibold text-gray-900 leading-tight">Alex Rivers</h1>
+            <span class="text-[12px] text-wa-green font-medium">Online</span>
+          </div>
+        </a>
+
+        <div class="flex items-center gap-2">
+          <button id="header-call" class="w-11 h-11 flex items-center justify-center text-gray-600 active:bg-gray-100 rounded-full transition-colors">
+            <iconify-icon icon="lucide:phone" width="20"></iconify-icon>
+          </button>
+          <button id="header-video" class="w-11 h-11 flex items-center justify-center text-gray-600 active:bg-gray-100 rounded-full transition-colors">
+            <iconify-icon icon="lucide:video" width="22"></iconify-icon>
+          </button>
+          <div class="relative">
+            <button id="header-menu" class="w-11 h-11 flex items-center justify-center text-gray-600 active:bg-gray-100 rounded-full transition-colors" onclick="toggleDropdown()">
+              <iconify-icon icon="lucide:more-vertical" width="20"></iconify-icon>
+            </button>
+            <div id="dropdown-menu" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[60] menu-animate">
+              <button type="button" id="menu-profile-link" class="flex items-center gap-3 px-4 py-2.5 text-[14px] text-gray-700 hover:bg-gray-50 transition-colors w-full text-left">
+                <iconify-icon icon="lucide:user" width="18"></iconify-icon>
+                View Profile
+              </button>
+              <a href="https://p.superdesign.dev/draft/222a8fc3-5be2-4119-b279-712560d960a1" id="menu-settings-link" class="flex items-center gap-3 px-4 py-2.5 text-[14px] text-gray-700 hover:bg-gray-50 transition-colors">
+                <iconify-icon icon="lucide:settings" width="18"></iconify-icon>
+                Settings
+              </a>
+              <div class="h-px bg-gray-100 my-1"></div>
+              <a href="https://p.superdesign.dev/draft/fd94130e-78eb-48e4-a45d-45e8e2e43c72" id="menu-logout-link" class="flex items-center gap-3 px-4 py-2.5 text-[14px] text-red-600 hover:bg-red-50 transition-colors">
+                <iconify-icon icon="lucide:log-out" width="18"></iconify-icon>
+                Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 space-y-4">
+      <div class="flex flex-col gap-1 items-center mb-4">
+        <span class="bg-white/50 px-3 py-1 rounded-full text-[11px] font-medium text-gray-600 uppercase tracking-wider">Yesterday</span>
+      </div>
+
+      <div class="message-in flex justify-start">
+        <div class="max-w-[85%] bg-white rounded-2xl rounded-tl-none p-3 shadow-sm">
+          <p class="text-[14px] text-gray-800 leading-relaxed">Hey! Did you see the final mockups for the new project?</p>
+          <div class="flex justify-end items-center mt-1 gap-1">
+            <span class="text-[10px] text-gray-400">10:42 AM</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="message-in flex justify-end">
+        <div class="max-w-[85%] bg-wa-green text-white rounded-2xl rounded-tr-none p-3 shadow-sm">
+          <p class="text-[14px] leading-relaxed">Not yet, can you send them over?</p>
+          <div class="flex justify-end items-center mt-1 gap-1">
+            <span class="text-[10px] opacity-80">10:45 AM</span>
+            <iconify-icon icon="lucide:check-check" class="text-[12px] opacity-90"></iconify-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="message-in flex justify-start">
+        <div class="max-w-[85%] bg-white rounded-2xl rounded-tl-none p-2 shadow-sm">
+          <div class="relative rounded-xl overflow-hidden mb-2">
+            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=400" alt="Shared" class="w-full h-auto object-cover">
+            <div class="absolute inset-0 bg-black/10"></div>
+          </div>
+          <p class="text-[14px] text-gray-800 px-1">Here's a preview of the main dashboard design.</p>
+          <div class="flex justify-end items-center mt-1 gap-1 px-1">
+            <span class="text-[10px] text-gray-400">11:02 AM</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="message-in flex justify-start">
+        <div class="max-w-[85%] bg-white rounded-2xl rounded-tl-none p-3 shadow-sm flex items-center gap-3 border border-gray-100">
+          <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-red-500 shrink-0">
+            <iconify-icon icon="lucide:file-text" width="24"></iconify-icon>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[14px] font-medium text-gray-900 truncate">Project_Specs_v2.pdf</p>
+            <p class="text-[12px] text-gray-500">2.4 MB • PDF</p>
+          </div>
+          <button class="text-gray-400 hover:text-gray-600">
+            <iconify-icon icon="lucide:download" width="18"></iconify-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="message-in flex justify-end">
+        <div class="max-w-[85%] bg-wa-green text-white rounded-2xl rounded-tr-none p-3 shadow-sm flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+            <iconify-icon icon="lucide:file-spreadsheet" width="24"></iconify-icon>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[14px] font-medium truncate">Budget_Report.xlsx</p>
+            <p class="text-[12px] opacity-80">156 KB • Excel</p>
+          </div>
+          <div class="flex flex-col items-end gap-1">
+            <iconify-icon icon="lucide:check-check" class="text-[12px]"></iconify-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="message-in flex justify-start">
+        <div class="bg-white/80 rounded-full px-4 py-2 flex items-center gap-1.5 shadow-sm">
+          <div class="typing-dot w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+          <div class="typing-dot w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+          <div class="typing-dot w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="shrink-0 bg-white border-t border-gray-100">
+      <div class="flex items-end gap-2 px-3 py-3">
+        <button id="input-attach" class="w-11 h-11 flex items-center justify-center text-gray-500 active:bg-gray-100 rounded-full shrink-0">
+          <iconify-icon icon="lucide:paperclip" width="22"></iconify-icon>
+        </button>
+        <div class="flex-1 min-h-[44px] bg-gray-100 rounded-[22px] flex items-center px-4 py-2 border border-transparent focus-within:border-wa-green focus-within:bg-white transition-all">
+          <textarea placeholder="Message" class="w-full bg-transparent border-none focus:ring-0 text-[15px] max-h-32 resize-none py-1 leading-normal" rows="1"></textarea>
+        </div>
+        <div class="flex gap-1 shrink-0">
+          <button id="input-send" class="w-11 h-11 flex items-center justify-center bg-wa-green text-white rounded-full shadow-md active:scale-95 transition-transform">
+            <iconify-icon icon="lucide:send" width="20" class="translate-x-0.5"></iconify-icon>
+          </button>
+        </div>
+      </div>
+
+      <nav class="flex justify-around items-center pt-3 border-t border-gray-50 pb-[34px] px-2 bg-white">
+        <a href="https://p.superdesign.dev/draft/000ccec3-e382-4c4d-ae00-8975daeef105" id="nav-chats-tab-link" class="flex flex-col items-center gap-1 text-wa-green">
+          <iconify-icon icon="lucide:message-circle" width="24"></iconify-icon>
+          <span class="text-[10px] font-semibold">Chats</span>
+        </a>
+        <button type="button" id="nav-calls-tab-link" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors">
+          <iconify-icon icon="lucide:phone" width="24"></iconify-icon>
+          <span class="text-[10px] font-medium">Calls</span>
+        </button>
+        <a href="https://p.superdesign.dev/draft/d8fb78c9-96dc-4e58-b714-fc1a9c4cc6d3" id="nav-cloud-tab-link" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors">
+          <iconify-icon icon="lucide:cloud" width="24"></iconify-icon>
+          <span class="text-[10px] font-medium">Cloud</span>
+        </a>
+        <a href="https://p.superdesign.dev/draft/222a8fc3-5be2-4119-b279-712560d960a1" id="nav-settings-tab-link" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors">
+          <iconify-icon icon="lucide:settings" width="24"></iconify-icon>
+          <span class="text-[10px] font-medium">Settings</span>
+        </a>
+      </nav>
+    </footer>
+  </div>
+
+  <script>
+    function toggleDropdown() {
+      const menu = document.getElementById('dropdown-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    window.onclick = function(event) {
+      if (!event.target.closest('#header-menu') && !event.target.closest('#dropdown-menu')) {
+        const menu = document.getElementById('dropdown-menu');
+        if (!menu.classList.contains('hidden')) {
+          menu.classList.add('hidden');
+        }
+      }
+    };
+  </script>
+</body>
+</html>

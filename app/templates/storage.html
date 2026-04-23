@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Shared Cloud | Your Chat{% endblock %}
+
+{% block content %}
+<div class="w-full min-h-screen flex flex-col bg-white">
+  <header class="shrink-0 pt-14 px-5 pb-4 bg-white border-b border-gray-50 z-20">
+    <div class="flex justify-between items-start mb-4">
+      <a href="{{ url_for('conversations.chats_page') }}" class="flex flex-col">
+        <h1 class="text-2xl font-bold text-gray-900">Shared Cloud</h1>
+        <p class="text-[13px] text-gray-500 mt-0.5">{{ conversation.other_participant(current_user.id).display_name or conversation.other_participant(current_user.id).phone_number }}</p>
+      </a>
+      <a href="{{ sharepoint_link }}" target="_blank" rel="noreferrer" class="w-11 h-11 flex items-center justify-center bg-blue-50 text-blue-600 rounded-full active:scale-95 transition-transform">
+        <iconify-icon icon="simple-icons:microsoftonedrive" width="24"></iconify-icon>
+      </a>
+    </div>
+
+    <div class="space-y-2">
+      <div class="flex justify-between items-center text-[12px] font-medium">
+        <span class="text-gray-600">{{ assets|length }} shared files</span>
+        <span class="text-wa-green">Cloud</span>
+      </div>
+      <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div class="h-full bg-wa-green rounded-full w-[28%]"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="shrink-0 flex gap-6 px-5 py-3 overflow-x-auto no-scrollbar border-b border-gray-50 bg-white sticky top-0 z-10">
+    <button class="file-tab text-[14px] font-semibold text-wa-green border-b-2 border-wa-green pb-1 whitespace-nowrap" data-filter="all">All Files</button>
+    <button class="file-tab text-[14px] font-medium text-gray-400 whitespace-nowrap" data-filter="image">Images</button>
+    <button class="file-tab text-[14px] font-medium text-gray-400 whitespace-nowrap" data-filter="video">Videos</button>
+    <button class="file-tab text-[14px] font-medium text-gray-400 whitespace-nowrap" data-filter="document">Docs</button>
+  </div>
+
+  <main class="flex-1 overflow-y-auto p-4">
+    <div id="gallery-grid" class="grid grid-cols-2 gap-3">
+      {% for asset in assets %}
+      <div class="gallery-card bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 active:scale-[0.98] transition-transform" data-category="{% if asset.mime_type.startswith('image/') %}image{% elif asset.mime_type.startswith('video/') %}video{% else %}document{% endif %}" data-file-id="{{ asset.id }}">
+        {% if asset.mime_type.startswith('image/') %}
+        <div class="aspect-square w-full relative">
+          <img src="{{ asset.preview_url }}" alt="{{ asset.original_name }}" class="w-full h-full object-cover">
+          <div class="absolute top-2 right-2 bg-black/40 backdrop-blur-sm p-1 rounded-lg text-white text-[10px] font-medium">IMG</div>
+        </div>
+        {% elif asset.mime_type.startswith('video/') %}
+        <div class="aspect-square w-full relative bg-gray-200 flex items-center justify-center">
+          <div class="w-12 h-12 rounded-full bg-black/30 flex items-center justify-center text-white backdrop-blur-sm">
+            <iconify-icon icon="lucide:play" width="24"></iconify-icon>
+          </div>
+        </div>
+        {% else %}
+        <div class="p-4">
+          <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center">
+            <iconify-icon icon="lucide:file-text" width="28"></iconify-icon>
+          </div>
+        </div>
+        {% endif %}
+        <div class="p-3">
+          <h3 class="text-[13px] font-semibold text-gray-800 truncate">{{ asset.original_name }}</h3>
+          <p class="text-[11px] text-gray-400 mt-0.5">{{ asset.upload_status }}</p>
+          <div class="flex items-center gap-3 mt-3 text-xs">
+            <a href="{{ asset.preview_url }}" class="text-wa-green font-semibold">Preview</a>
+            <a href="{{ asset.download_url }}" class="text-gray-500">Download</a>
+            {% if asset.upload_status == 'failed' and asset.sender_id == current_user.id %}
+            <button type="button" class="retry-file text-amber-600" data-retry-url="{{ asset.retry_url }}">Retry</button>
+            {% endif %}
+            {% if asset.sender_id == current_user.id %}
+            <button type="button" class="delete-file text-red-500" data-delete-url="{{ asset.delete_url }}">Delete</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-span-2 text-center text-gray-500 py-10">
+        <p class="text-lg font-semibold text-gray-900">No shared files yet</p>
+        <p class="text-sm mt-2">Files sent in this conversation will appear here.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+
+  <footer class="shrink-0 pb-[34px] bg-white border-t border-gray-100 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+    <div class="flex justify-around items-center h-16">
+      <a href="{{ url_for('conversations.chats_page') }}" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors">
+        <iconify-icon icon="lucide:message-circle" width="24"></iconify-icon>
+        <span class="text-[11px] font-medium">Chats</span>
+      </a>
+      <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors">
+        <iconify-icon icon="lucide:phone" width="24"></iconify-icon>
+        <span class="text-[11px] font-medium">Calls</span>
+      </button>
+      <a href="{{ url_for('files.gallery_page', conversation_id=conversation.id) }}" class="flex flex-col items-center gap-1 text-wa-green">
+        <iconify-icon icon="lucide:cloud" width="24"></iconify-icon>
+        <span class="text-[11px] font-medium">Cloud</span>
+      </a>
+      <a href="{{ url_for('settings.settings_page') }}" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors">
+        <iconify-icon icon="lucide:settings" width="24"></iconify-icon>
+        <span class="text-[11px] font-medium">Settings</span>
+      </a>
+    </div>
+  </footer>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/files.js') }}"></script>
+{% endblock %}

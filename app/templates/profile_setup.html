@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Set Up Profile | Your Chat{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+  <div class="w-full max-w-md bg-white rounded-[28px] shadow-xl border border-gray-100 p-8">
+    <div class="text-center mb-8">
+      <div class="w-14 h-14 mx-auto bg-wa-green rounded-2xl text-white flex items-center justify-center shadow-sm">
+        <iconify-icon icon="lucide:user-round-plus" width="28"></iconify-icon>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900 mt-4">Complete Your Profile</h1>
+      <p class="text-sm text-gray-500 mt-2">Add your display name and optional avatar so your chat is ready to use.</p>
+    </div>
+
+    <form id="profile-setup-form" class="space-y-5" enctype="multipart/form-data">
+      <div class="space-y-2">
+        <label for="display-name-input" class="text-sm font-medium text-gray-700">Display Name</label>
+        <input id="display-name-input" name="display_name" type="text" value="{{ current_user.display_name or '' }}" placeholder="Your name" class="w-full h-12 rounded-xl border border-gray-200 px-4 focus:outline-none focus:border-wa-green bg-gray-50 focus:bg-white transition-colors">
+      </div>
+
+      <div class="space-y-2">
+        <label for="status-text-input" class="text-sm font-medium text-gray-700">Status</label>
+        <textarea id="status-text-input" name="status_text" rows="3" placeholder="Say something about yourself" class="w-full rounded-xl border border-gray-200 px-4 py-3 focus:outline-none focus:border-wa-green bg-gray-50 focus:bg-white transition-colors">{{ current_user.status_text or '' }}</textarea>
+      </div>
+
+      <div class="space-y-2">
+        <label for="avatar-input" class="text-sm font-medium text-gray-700">Avatar</label>
+        <input id="avatar-input" name="avatar" type="file" accept="image/*" class="w-full rounded-xl border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-500 bg-gray-50">
+      </div>
+
+      <p id="profile-error" class="hidden text-sm text-red-600"></p>
+      <button class="w-full h-12 rounded-xl bg-wa-green text-white font-semibold shadow-md">Save and Continue</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}

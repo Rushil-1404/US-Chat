@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    .bg-chat-beige {
+      background-color: #dbd8d4;
+    }
+
+    .bg-wa-green {
+      background-color: #25d366;
+    }
+
+    .text-wa-green {
+      color: #25d366;
+    }
+
+    .border-wa-green {
+      border-color: #25d366;
+    }
+  </style>
+</head>
+<body>
+  <div class="w-full h-screen flex flex-col bg-chat-beige">
+    <header class="shrink-0 pt-14 bg-white border-b border-gray-100 z-10">
+      <div class="flex flex-col items-center justify-center pb-6 gap-2">
+        <div class="w-12 h-12 bg-wa-green rounded-2xl flex items-center justify-center text-white shadow-sm">
+          <iconify-icon icon="lucide:message-circle" width="28"></iconify-icon>
+        </div>
+        <h1 class="text-xl font-semibold text-gray-900">Your Chat</h1>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto bg-white px-8 pt-8 pb-10 rounded-t-[32px] -mt-6 shadow-2xl relative z-20">
+      <div class="flex items-center justify-between mb-10 px-4">
+        <div class="flex flex-col items-center gap-2">
+          <div id="step-1-circle" class="w-8 h-8 rounded-full bg-wa-green text-white flex items-center justify-center text-xs font-bold transition-colors">1</div>
+          <span id="step-1-label" class="text-[11px] font-medium text-gray-900 uppercase tracking-wider transition-colors">Phone</span>
+        </div>
+        <div class="h-[1px] flex-1 bg-gray-200 mx-4 -mt-6"></div>
+        <div class="flex flex-col items-center gap-2">
+          <div id="step-2-circle" class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold transition-colors">2</div>
+          <span id="step-2-label" class="text-[11px] font-medium text-gray-400 uppercase tracking-wider transition-colors">Verify</span>
+        </div>
+      </div>
+
+      <section id="phone-step" class="space-y-8">
+        <div class="space-y-2 text-center">
+          <h2 class="text-2xl font-bold text-gray-900">Enter Phone Number</h2>
+          <p class="text-sm text-gray-500 max-w-[240px] mx-auto">We will send an SMS with a verification code to your number.</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex gap-3">
+            <div class="w-24 shrink-0 flex items-center gap-2 px-3 h-14 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-colors">
+              <span class="text-lg">🇺🇸</span>
+              <span class="text-gray-900 font-medium text-sm">+1</span>
+              <iconify-icon icon="lucide:chevron-down" width="14" class="text-gray-400 ml-auto"></iconify-icon>
+            </div>
+            <div class="flex-1">
+              <input type="tel" placeholder="(555) 000-0000" class="w-full h-14 px-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-lg focus:outline-none focus:border-wa-green focus:bg-white transition-all placeholder:text-gray-300">
+            </div>
+          </div>
+
+          <a href="https://p.superdesign.dev/draft/000ccec3-e382-4c4d-ae00-8975daeef105" id="send-otp-btn" class="w-full h-14 bg-wa-green text-white font-semibold rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            Send Code
+            <iconify-icon icon="lucide:arrow-right" width="18"></iconify-icon>
+          </a>
+        </div>
+      </section>
+
+      <section id="otp-step" class="mt-12 pt-12 border-t border-gray-100 space-y-8 opacity-40 pointer-events-none transition-all duration-500">
+        <div class="space-y-2 text-center">
+          <h2 class="text-2xl font-bold text-gray-900">Verification</h2>
+          <p class="text-sm text-gray-500">Enter the 6-digit code sent to your phone.</p>
+        </div>
+
+        <div class="flex justify-between gap-2">
+          <input type="text" maxlength="1" class="w-12 h-14 text-center text-2xl font-bold bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-wa-green focus:bg-white transition-all">
+          <input type="text" maxlength="1" class="w-12 h-14 text-center text-2xl font-bold bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-wa-green focus:bg-white transition-all">
+          <input type="text" maxlength="1" class="w-12 h-14 text-center text-2xl font-bold bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-wa-green focus:bg-white transition-all">
+          <input type="text" maxlength="1" class="w-12 h-14 text-center text-2xl font-bold bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-wa-green focus:bg-white transition-all">
+          <input type="text" maxlength="1" class="w-12 h-14 text-center text-2xl font-bold bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-wa-green focus:bg-white transition-all">
+          <input type="text" maxlength="1" class="w-12 h-14 text-center text-2xl font-bold bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-wa-green focus:bg-white transition-all">
+        </div>
+
+        <a href="https://p.superdesign.dev/draft/000ccec3-e382-4c4d-ae00-8975daeef105" id="cta-verify-link" class="w-full h-14 bg-wa-green text-white font-semibold rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+          Verify &amp; Continue
+          <iconify-icon icon="lucide:check-circle" width="18"></iconify-icon>
+        </a>
+
+        <p class="text-center text-sm">
+          Didn't get the code?
+          <button type="button" id="resend-link" class="text-wa-green hover:text-green-600 hover:underline font-semibold transition-all">Resend</button>
+        </p>
+      </section>
+    </main>
+
+    <footer class="shrink-0 pb-[34px] bg-white px-8 pt-4 text-center">
+      <p class="text-[11px] text-gray-400">By continuing, you agree to our Terms and Privacy Policy.</p>
+    </footer>
+  </div>
+</body>
+</html>
