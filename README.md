@@ -1,194 +1,177 @@
-# Your Chat MVP
+# US Chat
 
-A minimalist 1-on-1 chat application built with Flask, SQLAlchemy, Flask-SocketIO, and a pluggable storage/auth architecture.
+US Chat is a mobile-first 1-on-1 chat app built with Next.js App Router and Supabase. It replaces the earlier Flask prototype with a single deployment target: Vercel for the app, Supabase for auth, Postgres, realtime, and storage.
 
-## What is included
+## Stack
 
-- Phone-based OTP sign-in with a dev-mode OTP provider
-- Server-side session records with HTTP-only cookies
-- Profile bootstrap flow for new users
-- 1-on-1 conversation lookup by phone number
-- Real-time text messaging with Socket.IO events
-- Attachment uploads for images, video, PDF, Word, PowerPoint, and Excel
+- Next.js 16 App Router
+- React 19
+- Tailwind CSS
+- Supabase Auth
+- Supabase Postgres + Realtime
+- Supabase Storage
+- Vercel Hobby
+
+## Product Scope
+
+- Google login and email/password login
+- First-run onboarding with unique username selection
+- Username-based direct chats
+- 1-on-1 conversations only
+- Realtime messaging with read-state updates
+- File attachments for images, videos, PDF, DOC/DOCX, PPT/PPTX, XLS/XLSX
 - Shared-files gallery per conversation
-- Local storage fallback and Microsoft Graph storage abstraction
-- Settings persistence for profile and user preferences
-- Demo data seeding for fast local validation
+- Editable profile and app settings
 
-## Quick start
+## Local Setup
 
-1. Install dependencies:
-
-```powershell
-python -m pip install -r requirements.txt
-```
-
-2. Copy environment defaults if needed:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-3. Start the app:
-
-```powershell
-python run.py
-```
-
-4. Open the app at [http://127.0.0.1:5000](http://127.0.0.1:5000)
-
-## GitHub Codespaces
-
-If you want to share a live demo without setting up paid hosting first, GitHub Codespaces is the easiest path for this repo.
-
-1. Open the GitHub repo and create a new Codespace on `main`.
-2. Wait for the dev container to finish setup. The repo includes a `.devcontainer/devcontainer.json` file that installs Python dependencies automatically.
-3. In the Codespaces terminal, start the app:
+1. Create a Supabase project.
+2. Copy [`.env.example`](./.env.example) to `.env.local`.
+3. Fill in:
 
 ```bash
-python run.py
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-4. Open the `PORTS` tab and find port `5000`.
-5. Right-click port `5000` and change visibility to `Public`.
-6. Copy the `https://...app.github.dev` URL and send it to your friend.
+4. Install dependencies:
 
-Notes:
+```bash
+npm install
+```
 
-- The port must stay on `HTTP`. GitHub notes that if you switch a public forwarded port to `HTTPS`, its visibility changes back to private.
-- Codespaces is good for demos, but it is not permanent hosting. If the codespace stops, the app goes offline.
-- This repo uses dev OTP mode by default, so the OTP code is shown in the UI for testing.
+5. Start the app:
 
-## Internet deployment
+```bash
+npm run dev
+```
 
-The app can be deployed publicly so another person can use it from a different network, but there is one important auth caveat:
+6. Open [http://localhost:3000](http://localhost:3000)
 
-- `OTP_PROVIDER_MODE=dev` works for demos, but it is not secure for a public app because the OTP is exposed in the UI.
-- For real private use, you should integrate a real SMS OTP provider before sharing the URL broadly.
+## Supabase Setup
 
-### Recommended simplest path: Render
+### 1. Database migration
 
-This repo now includes:
+Run the SQL from [`supabase/migrations/20260423120000_initial_chat_app.sql`](./supabase/migrations/20260423120000_initial_chat_app.sql) in the Supabase SQL Editor, or apply it with the Supabase CLI if you already use one.
 
-- `render.yaml` for a Render web service + managed Postgres
-- `Procfile` for generic process-based platforms
-- `gunicorn` and `psycopg` in `requirements.txt`
-- `PORT`/`HOST` aware startup in `run.py`
+That migration creates:
 
-### Render deployment steps
+- `profiles`
+- `user_settings`
+- `conversations`
+- `messages`
+- row-level security policies
+- storage buckets for `avatars` and `attachments`
+- helper RPC functions for chat creation, read updates, and chat-list loading
 
-1. Push this project to GitHub.
-2. Create a new [Render Blueprint](https://render.com/docs/blueprint-spec) from the repo.
-3. Let Render create:
-   - the web service
-   - the managed Postgres database
-4. After the first deploy, open the service settings and verify these values:
-   - `SESSION_COOKIE_SECURE=true`
-   - `AUTO_SEED_DEMO=false`
-   - `OTP_PROVIDER_MODE=dev` only if you are okay with demo-only auth
-5. Share the Render app URL with your friend.
+### 2. Authentication
 
-### Storage note
+Enable these auth providers in Supabase:
 
-- The included `render.yaml` mounts a persistent disk for local file storage.
-- If you want durable shared file storage across environments and cleaner long-term behavior, configure Microsoft Graph and switch `STORAGE_MODE=graph`.
+- Email
+- Google
 
-### Production auth note
+Recommended auth settings:
 
-If you want this to be safe for real-world use, the next step should be implementing an actual SMS provider behind `SmsOtpProvider`.
+- Require email confirmation for email/password signups
+- Set the site URL to your local or deployed app URL
+- Add `/auth/callback` as an allowed redirect path for every environment you use
 
-## Local development defaults
+Examples:
 
-- Database: SQLite at `instance/chat_app.db`
-- OTP mode: `dev`
-- Storage mode: `auto`
-  - Uses Microsoft Graph if credentials are configured
-  - Falls back to local storage otherwise
-- Demo users are automatically seeded by default:
-  - `+15550000001`
-  - `+15550000002`
+- `http://localhost:3000/auth/callback`
+- `https://your-production-domain.vercel.app/auth/callback`
 
-In dev OTP mode, the OTP is shown on screen after requesting it and also logged to the server console.
+### 3. Google provider
 
-## Useful commands
+In Google Cloud:
 
-Create missing tables:
+1. Create OAuth credentials
+2. Add the Supabase callback URL from the Supabase Google provider screen
+3. Paste the Google client ID and secret into Supabase Auth provider settings
+
+## App Flow
+
+1. User signs up with email/password or signs in with Google
+2. Supabase Auth manages credentials and sessions
+3. New users are redirected to `/onboarding`
+4. User picks a unique username and optional avatar
+5. Chats can then be created by entering another user's username
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm test
+```
+
+## Vercel Deployment
+
+1. Import this repository into Vercel
+2. Add these environment variables:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+3. Deploy
+4. Add your Vercel production URL to Supabase Auth settings
+5. Add the production callback URL:
+
+```text
+https://your-domain/auth/callback
+```
+
+6. If you use Google login, make sure the corresponding redirect and authorized origin values are also configured in Google Cloud
+
+## Docker
+
+You can package the app as a container with Docker.
+
+Important:
+
+- the app's `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are used in client-side code
+- that means they must be available at image build time, not only at container runtime
+
+### Build the image
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co \
+  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key \
+  -t us-chat .
+```
+
+PowerShell single-line version:
 
 ```powershell
-flask --app run.py init-db
+docker build --build-arg NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key -t us-chat .
 ```
 
-Refresh demo data:
+### Run the container
 
-```powershell
-flask --app run.py seed-demo
+```bash
+docker run --rm -p 3000:3000 us-chat
 ```
 
-Run tests:
+Then open [http://localhost:3000](http://localhost:3000)
 
-```powershell
-pytest
-```
+### Rebuild when env values change
 
-## Environment variables
+If you switch Supabase projects or change the public key, rebuild the image so the client bundle picks up the new values.
 
-### Core
+## Project Structure
 
-- `SECRET_KEY`
-- `DATABASE_URL`
-- `SESSION_COOKIE_SECURE`
-- `SESSION_LIFETIME_DAYS`
-
-### OTP
-
-- `OTP_PROVIDER_MODE=dev|sms`
-- `DEV_OTP_EXPOSE_CODE=true|false`
-- `OTP_LENGTH`
-- `OTP_EXPIRY_SECONDS`
-- `OTP_RATE_LIMIT_WINDOW_SECONDS`
-- `OTP_MAX_REQUESTS_PER_WINDOW`
-- `OTP_MAX_VERIFY_ATTEMPTS`
-
-### Storage
-
-- `STORAGE_MODE=auto|local|graph`
-- `LOCAL_STORAGE_ROOT`
-- `MAX_UPLOAD_SIZE_MB`
-
-### Microsoft Graph / Entra ID
-
-- `GRAPH_TENANT_ID`
-- `GRAPH_CLIENT_ID`
-- `GRAPH_CLIENT_SECRET`
-- `GRAPH_SHARE_LINK`
-- `GRAPH_SITE_ID`
-- `GRAPH_DRIVE_ID`
-- `GRAPH_ROOT_ITEM_ID`
-- `GRAPH_SIMPLE_UPLOAD_MAX_BYTES`
-
-## Microsoft Graph setup
-
-1. Register an application in Microsoft Entra ID.
-2. Grant the least-privilege Microsoft Graph permissions required for the target document library or shared drive location.
-3. Capture:
-   - tenant ID
-   - client ID
-   - client secret or certificate flow equivalent
-4. Set `GRAPH_SHARE_LINK` to the shared OneDrive/SharePoint folder entry point.
-5. Optionally set `GRAPH_SITE_ID`, `GRAPH_DRIVE_ID`, and `GRAPH_ROOT_ITEM_ID` directly if you already resolved them.
-6. Set `STORAGE_MODE=graph` to force Graph in environments where local fallback should be disabled.
-
-## Project layout
-
-- `app/__init__.py`: app factory, startup hooks, CLI, database initialization
-- `app/models.py`: SQLAlchemy models
-- `app/auth`, `app/users`, `app/conversations`, `app/messages`, `app/files`, `app/settings`: blueprints
-- `app/services`: OTP, sessions, conversations, messaging, file handling, storage, serialization, demo seed data
-- `app/templates`: Jinja templates using the existing minimalist visual direction
-- `app/static/js`: page-level JavaScript for OTP, messaging, uploads, gallery filtering, and settings persistence
-- `tests`: pytest coverage for major flows
+- [`src/app`](./src/app): App Router pages and auth callback route
+- [`src/components`](./src/components): auth, chats, shared-files, settings, layout UI
+- [`src/lib`](./src/lib): validation, Supabase helpers, server auth, shared utilities
+- [`supabase/migrations`](./supabase/migrations): SQL schema, RLS, RPCs, and storage policies
 
 ## Notes
 
-- The Graph storage provider is implemented and ready for real credentials, but local storage remains the default fallback for unconfigured environments.
-- The `sms` OTP provider mode is intentionally a production placeholder. In local development, use `OTP_PROVIDER_MODE=dev`.
+- This repo now targets Vercel + Supabase only; the old Flask/OTP/Render stack has been removed.
+- Supabase free projects can pause after inactivity, so this is a strong hobby deployment path, not an uptime-guaranteed enterprise setup.
+- Username is intentionally immutable in v1. Display name, avatar, status, and settings remain editable.
