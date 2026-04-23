@@ -37,6 +37,28 @@ python run.py
 
 4. Open the app at [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
+## GitHub Codespaces
+
+If you want to share a live demo without setting up paid hosting first, GitHub Codespaces is the easiest path for this repo.
+
+1. Open the GitHub repo and create a new Codespace on `main`.
+2. Wait for the dev container to finish setup. The repo includes a `.devcontainer/devcontainer.json` file that installs Python dependencies automatically.
+3. In the Codespaces terminal, start the app:
+
+```bash
+python run.py
+```
+
+4. Open the `PORTS` tab and find port `5000`.
+5. Right-click port `5000` and change visibility to `Public`.
+6. Copy the `https://...app.github.dev` URL and send it to your friend.
+
+Notes:
+
+- The port must stay on `HTTP`. GitHub notes that if you switch a public forwarded port to `HTTPS`, its visibility changes back to private.
+- Codespaces is good for demos, but it is not permanent hosting. If the codespace stops, the app goes offline.
+- This repo uses dev OTP mode by default, so the OTP code is shown in the UI for testing.
+
 ## Internet deployment
 
 The app can be deployed publicly so another person can use it from a different network, but there is one important auth caveat:
