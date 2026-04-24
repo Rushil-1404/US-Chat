@@ -84,17 +84,17 @@ export function ChatShell({ currentProfile, chats }: ChatShellProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      <header className="sticky top-0 z-20 border-b border-black/5 bg-white/95 px-5 pb-4 pt-12 backdrop-blur">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950">
+      <header className="sticky top-0 z-20 border-b border-black/5 bg-white/95 px-5 pb-4 pt-12 backdrop-blur dark:border-white/10 dark:bg-neutral-950/95">
         <div className="mb-5 flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand/70">Your Inbox</p>
-            <h1 className="text-3xl font-extrabold tracking-tight text-neutral-950">Chats</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-neutral-950 dark:text-neutral-50">Chats</h1>
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="flex h-11 w-11 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10"
             >
               <Camera className="h-5 w-5" />
             </button>
@@ -102,16 +102,16 @@ export function ChatShell({ currentProfile, chats }: ChatShellProps) {
               <button
                 type="button"
                 onClick={() => setMenuOpen((value) => !value)}
-                className="flex h-11 w-11 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10"
               >
                 <MoreVertical className="h-5 w-5" />
               </button>
               {menuOpen ? (
-                <div className="absolute right-0 top-12 w-48 rounded-3xl border border-black/5 bg-white p-2 shadow-float">
+                <div className="absolute right-0 top-12 w-48 rounded-3xl border border-black/5 bg-white p-2 shadow-float dark:border-white/10 dark:bg-neutral-900">
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                    className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-500/10"
                   >
                     <LogOut className="h-4 w-4" />
                     Logout
@@ -122,25 +122,25 @@ export function ChatShell({ currentProfile, chats }: ChatShellProps) {
           </div>
         </div>
 
-        <label className="flex h-12 items-center gap-3 rounded-2xl border border-transparent bg-neutral-100 px-4 focus-within:border-brand focus-within:bg-white">
-          <Search className="h-4 w-4 text-neutral-400" />
+        <label className="flex h-12 items-center gap-3 rounded-2xl border border-transparent bg-neutral-100 px-4 focus-within:border-brand focus-within:bg-white dark:bg-neutral-900 dark:focus-within:bg-neutral-900">
+          <Search className="h-4 w-4 text-neutral-400 dark:text-neutral-500" />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search chats"
-            className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
+            className="w-full bg-transparent text-sm text-neutral-950 outline-none placeholder:text-neutral-400 dark:text-neutral-50 dark:placeholder:text-neutral-500"
           />
         </label>
       </header>
 
       <main className="relative flex-1 overflow-y-auto pb-24">
-        <div className="divide-y divide-black/5">
+        <div className="divide-y divide-black/5 dark:divide-white/10">
           {filteredChats.length ? (
             filteredChats.map((chat) => (
               <Link
                 key={chat.conversation_id}
                 href={`/chats/${chat.conversation_id}`}
-                className="flex items-center gap-4 px-5 py-4 transition hover:bg-neutral-50"
+                className="flex items-center gap-4 px-5 py-4 transition hover:bg-neutral-50 dark:hover:bg-white/5"
               >
                 <div className="relative">
                   <AvatarChip
@@ -149,22 +149,22 @@ export function ChatShell({ currentProfile, chats }: ChatShellProps) {
                     className="h-14 w-14"
                     fallbackClassName="text-lg"
                   />
-                  <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-brand" />
+                  <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-brand dark:border-neutral-950" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-[16px] font-semibold text-neutral-900">
+                      <p className="truncate text-[16px] font-semibold text-neutral-900 dark:text-neutral-100">
                         {chat.partner_display_name}
                       </p>
-                      <p className="truncate text-xs font-medium text-neutral-400">@{chat.partner_username}</p>
+                      <p className="truncate text-xs font-medium text-neutral-400 dark:text-neutral-500">@{chat.partner_username}</p>
                     </div>
-                    <span className={cn("shrink-0 text-[11px]", chat.unread_count ? "font-semibold text-brand" : "text-neutral-400")}>
+                    <span className={cn("shrink-0 text-[11px]", chat.unread_count ? "font-semibold text-brand" : "text-neutral-400 dark:text-neutral-500")}>
                       {formatTimestamp(chat.latest_created_at ?? chat.conversation_updated_at)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
-                    <p className="truncate text-sm text-neutral-500">
+                    <p className="truncate text-sm text-neutral-500 dark:text-neutral-400">
                       {chat.latest_attachment_name ?? chat.latest_message_text ?? "Start a conversation"}
                     </p>
                     {chat.unread_count ? (
@@ -178,8 +178,8 @@ export function ChatShell({ currentProfile, chats }: ChatShellProps) {
             ))
           ) : (
             <div className="px-6 py-16 text-center">
-              <p className="text-lg font-bold text-neutral-900">No chats yet</p>
-              <p className="mt-2 text-sm text-neutral-500">Start a direct conversation by username.</p>
+              <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">No chats yet</p>
+              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">Start a direct conversation by username.</p>
             </div>
           )}
         </div>
@@ -193,17 +193,17 @@ export function ChatShell({ currentProfile, chats }: ChatShellProps) {
         </button>
       </main>
 
-      <div className="sticky bottom-0 bg-white/95 backdrop-blur">
+      <div className="sticky bottom-0 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:bg-neutral-950/95">
         <BottomNav active="chats" />
       </div>
 
       {modalOpen ? (
         <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/30 p-4 sm:items-center">
-          <div className="w-full max-w-md rounded-[2rem] border border-black/5 bg-white p-6 shadow-float">
+          <div className="w-full max-w-md rounded-[2rem] border border-black/5 bg-white p-6 shadow-float dark:border-white/10 dark:bg-neutral-900">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-neutral-950">Start a new chat</h2>
-                <p className="text-sm text-neutral-500">Find someone by their username.</p>
+                <h2 className="text-xl font-bold text-neutral-950 dark:text-neutral-50">Start a new chat</h2>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">Find someone by their username.</p>
               </div>
               <button
                 type="button"
@@ -211,7 +211,7 @@ export function ChatShell({ currentProfile, chats }: ChatShellProps) {
                   setModalOpen(false);
                   setModalError(null);
                 }}
-                className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-400 transition hover:bg-neutral-100"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-400 transition hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -219,11 +219,11 @@ export function ChatShell({ currentProfile, chats }: ChatShellProps) {
 
             <form onSubmit={handleCreateChat} className="space-y-4">
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-neutral-700">Username</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Username</span>
                 <input
                   value={username}
                   onChange={(event) => setUsername(event.target.value.toLowerCase())}
-                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm outline-none transition focus:border-brand focus:bg-white"
+                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm text-neutral-950 outline-none transition focus:border-brand focus:bg-white dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:bg-neutral-950"
                   placeholder="friend_name"
                 />
               </label>

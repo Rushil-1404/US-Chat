@@ -12,7 +12,7 @@ type AvatarChipProps = {
 export function AvatarChip({ src, name, className, fallbackClassName }: AvatarChipProps) {
   if (src) {
     return (
-      <div className={cn("relative overflow-hidden rounded-full bg-brand/10", className)}>
+      <div className={cn("relative overflow-hidden rounded-full bg-brand/10 dark:bg-brand/20", className)}>
         <Image src={src} alt={name ?? "Avatar"} fill className="object-cover" />
       </div>
     );
@@ -21,7 +21,7 @@ export function AvatarChip({ src, name, className, fallbackClassName }: AvatarCh
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-full bg-brand/15 font-bold text-brand",
+        "flex items-center justify-center rounded-full bg-brand/15 font-bold text-brand dark:bg-brand/20",
         className,
         fallbackClassName,
       )}

@@ -3,11 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { startTransition, useEffect, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Download, LoaderCircle, LogOut, MoreVertical, Paperclip, Play, Send, Settings, Video } from "lucide-react";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { AvatarChip } from "@/components/ui/avatar-chip";
+import { ATTACHMENT_ACCEPT } from "@/lib/constants";
 import { buildAttachmentPath, validateAttachment } from "@/lib/files";
 import { createClient } from "@/lib/supabase/client";
 import type { ConversationRow, MessageRow, MessageView, ProfileRow } from "@/lib/types";
@@ -20,6 +21,12 @@ type ChatRoomProps = {
   partner: ProfileRow & { avatar_url: string | null };
   initialMessages: MessageView[];
 };
+
+const NEAR_BOTTOM_DISTANCE = 96;
+
+function isScrolledNearBottom(element: Pick<HTMLDivElement, "clientHeight" | "scrollHeight" | "scrollTop">) {
+  return element.scrollHeight - element.scrollTop - element.clientHeight <= NEAR_BOTTOM_DISTANCE;
+}
 
 function messageStatus(message: MessageView) {
   if (!message.is_mine) {
@@ -50,8 +57,11 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
   const [uploadLabel, setUploadLabel] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasNewMessages, setHasNewMessages] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const isNearBottomRef = useRef(true);
+  const latestMessageSnapshotRef = useRef<{ id: string | null; count: number } | null>(null);
 
   useEffect(() => {
     void supabase.rpc("mark_conversation_read", {
@@ -59,9 +69,51 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
     });
   }, [conversation.id, supabase]);
 
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    const list = listRef.current;
+
+    if (!list) {
+      return;
+    }
+
+    const run = () => {
+      list.scrollTo({ top: list.scrollHeight, behavior });
+      isNearBottomRef.current = true;
+    };
+
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(run);
+      return;
+    }
+
+    run();
+  }, []);
+
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages]);
+    const latestMessage = messages[messages.length - 1];
+    const latestId = latestMessage?.id ?? null;
+    const previous = latestMessageSnapshotRef.current;
+    latestMessageSnapshotRef.current = { id: latestId, count: messages.length };
+
+    if (!previous) {
+      scrollToBottom("auto");
+      return;
+    }
+
+    const hasNewLatestMessage = latestId !== previous.id || messages.length > previous.count;
+
+    if (!hasNewLatestMessage) {
+      return;
+    }
+
+    if (latestMessage?.sender_id === currentUserId || isNearBottomRef.current) {
+      setHasNewMessages(false);
+      scrollToBottom("smooth");
+      return;
+    }
+
+    setHasNewMessages(true);
+  }, [currentUserId, messages, scrollToBottom]);
 
   useEffect(() => {
     const channel = supabase
@@ -260,38 +312,47 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
     });
   }
 
+  function handleListScroll(event: React.UIEvent<HTMLDivElement>) {
+    const nearBottom = isScrolledNearBottom(event.currentTarget);
+    isNearBottomRef.current = nearBottom;
+
+    if (nearBottom) {
+      setHasNewMessages(false);
+    }
+  }
+
   return (
-    <div className="flex min-h-screen flex-col bg-[linear-gradient(180deg,#f5f0e7_0%,#faf8f3_22%,#ffffff_100%)]">
-      <header className="sticky top-0 z-20 border-b border-black/5 bg-white/95 px-4 pb-3 pt-10 backdrop-blur">
+    <div className="relative flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-[linear-gradient(180deg,#f5f0e7_0%,#faf8f3_22%,#ffffff_100%)] dark:bg-[linear-gradient(180deg,#111a16_0%,#0d1411_42%,#090d0c_100%)]">
+      <header className="z-20 shrink-0 border-b border-black/5 bg-white/95 px-4 pb-3 pt-[calc(2.5rem+env(safe-area-inset-top))] backdrop-blur dark:border-white/10 dark:bg-neutral-950/95">
         <div className="flex items-center justify-between gap-4">
           <Link href="/chats" className="flex min-w-0 items-center gap-3">
-            <ArrowLeft className="h-5 w-5 text-neutral-500" />
+            <ArrowLeft className="h-5 w-5 text-neutral-500 dark:text-neutral-300" />
             <div className="relative">
               <AvatarChip src={partner.avatar_url} name={partner.display_name} className="h-10 w-10" />
-              <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-brand" />
+              <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-brand dark:border-neutral-950" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-[15px] font-semibold text-neutral-950">{partner.display_name}</p>
+              <p className="truncate text-[15px] font-semibold text-neutral-950 dark:text-neutral-50">{partner.display_name}</p>
               <p className="truncate text-xs text-brand">@{partner.username}</p>
             </div>
           </Link>
 
           <div className="relative flex items-center gap-2">
-            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-400">
+            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-400 transition hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10">
               <Video className="h-5 w-5" />
             </button>
             <button
               type="button"
               onClick={() => setMenuOpen((value) => !value)}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-400"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-400 transition hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10"
             >
               <MoreVertical className="h-5 w-5" />
             </button>
             {menuOpen ? (
-              <div className="absolute right-0 top-11 w-44 rounded-3xl border border-black/5 bg-white p-2 shadow-float">
+              <div className="absolute right-0 top-11 w-44 rounded-3xl border border-black/5 bg-white p-2 shadow-float dark:border-white/10 dark:bg-neutral-900">
                 <Link
                   href="/settings"
-                  className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+                  className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 dark:text-neutral-200 dark:hover:bg-white/10"
                 >
                   <Settings className="h-4 w-4" />
                   Settings
@@ -299,7 +360,7 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                  className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-500/10"
                 >
                   <LogOut className="h-4 w-4" />
                   Logout
@@ -310,17 +371,24 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
         </div>
       </header>
 
-      <main ref={listRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-5 pb-28">
+      <main
+        ref={listRef}
+        data-testid="message-list"
+        onScroll={handleListScroll}
+        className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 py-5"
+      >
         {messages.map((message) => (
           <div key={message.id} className={cn("flex", message.is_mine ? "justify-end" : "justify-start")}>
             <div
               className={cn(
                 "max-w-[84%] rounded-[1.5rem] px-4 py-3 shadow-sm",
-                message.is_mine ? "rounded-tr-md bg-brand text-white" : "rounded-tl-md bg-white text-neutral-900",
+                message.is_mine
+                  ? "rounded-tr-md bg-brand text-white"
+                  : "rounded-tl-md bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100",
               )}
             >
               {message.message_type === "text" || !message.attachment_path ? (
-                <p className={cn("text-sm leading-6", !message.is_mine && "text-neutral-700")}>
+                <p className={cn("text-sm leading-6", !message.is_mine && "text-neutral-700 dark:text-neutral-200")}>
                   {message.text_body}
                 </p>
               ) : message.message_type === "image" ? (
@@ -339,7 +407,7 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
                       Image unavailable
                     </div>
                   )}
-                  <p className={cn("text-sm font-semibold", !message.is_mine && "text-neutral-700")}>
+                  <p className={cn("text-sm font-semibold", !message.is_mine && "text-neutral-700 dark:text-neutral-200")}>
                     {message.attachment_name}
                   </p>
                 </div>
@@ -348,7 +416,7 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
                   href={message.signed_url ?? "#"}
                   target="_blank"
                   rel="noreferrer"
-                  className={cn("flex items-center gap-3", !message.is_mine && "text-neutral-700")}
+                  className={cn("flex items-center gap-3", !message.is_mine && "text-neutral-700 dark:text-neutral-200")}
                 >
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-black/15 text-white">
                     <Play className="ml-0.5 h-4 w-4" />
@@ -360,9 +428,9 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
                   href={message.signed_url ?? "#"}
                   target="_blank"
                   rel="noreferrer"
-                  className={cn("flex items-center gap-3", !message.is_mine && "text-neutral-700")}
+                  className={cn("flex items-center gap-3", !message.is_mine && "text-neutral-700 dark:text-neutral-200")}
                 >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-red-50 text-red-500 dark:bg-red-500/10 dark:text-red-300">
                     <Download className="h-4 w-4" />
                   </span>
                   <span className="truncate text-sm font-semibold">{message.attachment_name}</span>
@@ -372,7 +440,7 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
               <div
                 className={cn(
                   "mt-2 flex items-center justify-end gap-2 text-[10px]",
-                  message.is_mine ? "text-white/80" : "text-neutral-400",
+                  message.is_mine ? "text-white/80" : "text-neutral-400 dark:text-neutral-500",
                 )}
               >
                 <span>{formatTimestamp(message.created_at)}</span>
@@ -383,25 +451,38 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
         ))}
       </main>
 
-      <footer className="sticky bottom-0 z-20 border-t border-black/5 bg-white/95 backdrop-blur">
-        {uploadLabel ? <p className="px-4 pt-3 text-xs font-medium text-neutral-500">{uploadLabel}</p> : null}
+      {hasNewMessages ? (
+        <button
+          type="button"
+          onClick={() => {
+            setHasNewMessages(false);
+            scrollToBottom("smooth");
+          }}
+          className="absolute bottom-[calc(8rem+env(safe-area-inset-bottom))] left-1/2 z-20 -translate-x-1/2 rounded-full bg-neutral-950 px-4 py-2 text-xs font-bold text-white shadow-float transition hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200"
+        >
+          New messages
+        </button>
+      ) : null}
+
+      <footer className="z-20 shrink-0 border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-white/10 dark:bg-neutral-950/95">
+        {uploadLabel ? <p className="px-4 pt-3 text-xs font-medium text-neutral-500 dark:text-neutral-400">{uploadLabel}</p> : null}
         {error ? <p className="px-4 pt-3 text-xs font-medium text-red-600">{error}</p> : null}
         <form onSubmit={sendTextMessage} className="flex items-end gap-2 px-3 py-3">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex h-11 w-11 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10"
           >
             <Paperclip className="h-5 w-5" />
           </button>
-          <input ref={fileInputRef} type="file" hidden onChange={handleFileChange} />
-          <div className="flex-1 rounded-[1.75rem] border border-transparent bg-neutral-100 px-4 py-3 focus-within:border-brand focus-within:bg-white">
+          <input ref={fileInputRef} type="file" accept={ATTACHMENT_ACCEPT} hidden onChange={handleFileChange} />
+          <div className="flex-1 rounded-[1.75rem] border border-transparent bg-neutral-100 px-4 py-3 focus-within:border-brand focus-within:bg-white dark:bg-neutral-900 dark:focus-within:bg-neutral-900">
             <textarea
               rows={1}
               value={text}
               onChange={(event) => setText(event.target.value)}
               placeholder="Message"
-              className="max-h-32 w-full resize-none bg-transparent text-sm outline-none placeholder:text-neutral-400"
+              className="max-h-32 w-full resize-none bg-transparent text-sm text-neutral-950 outline-none placeholder:text-neutral-400 dark:text-neutral-50 dark:placeholder:text-neutral-500"
             />
           </div>
           <button

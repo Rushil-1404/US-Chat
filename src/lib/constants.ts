@@ -22,6 +22,12 @@ export const ALLOWED_DOCUMENT_TYPES = [
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 ];
+export const ALLOWED_ATTACHMENT_TYPES = [
+  ...ALLOWED_IMAGE_TYPES,
+  ...ALLOWED_VIDEO_TYPES,
+  ...ALLOWED_DOCUMENT_TYPES,
+];
+export const ATTACHMENT_ACCEPT = ALLOWED_ATTACHMENT_TYPES.join(",");
 
 export const AUTH_ROUTES = ["/login", "/signup", "/forgot-password", "/reset-password", "/auth/callback"];
 export const APP_ROUTES = ["/onboarding", "/chats", "/files", "/settings"];

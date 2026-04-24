@@ -99,6 +99,8 @@ export function SettingsForm({ profile, settings }: SettingsFormProps) {
       return;
     }
 
+    document.documentElement.dataset.theme = parsed.data.theme;
+
     startTransition(() => {
       router.refresh();
     });
@@ -114,102 +116,102 @@ export function SettingsForm({ profile, settings }: SettingsFormProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fafaf8]">
-      <header className="sticky top-0 z-20 border-b border-black/5 bg-white/95 px-4 pb-4 pt-10 backdrop-blur">
+    <div className="flex min-h-screen flex-col bg-[#fafaf8] dark:bg-neutral-950">
+      <header className="sticky top-0 z-20 border-b border-black/5 bg-white/95 px-4 pb-4 pt-10 backdrop-blur dark:border-white/10 dark:bg-neutral-950/95">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => router.push("/chats")}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand/70">Preferences</p>
-            <h1 className="text-2xl font-extrabold text-neutral-950">Settings</h1>
+            <h1 className="text-2xl font-extrabold text-neutral-950 dark:text-neutral-50">Settings</h1>
           </div>
         </div>
       </header>
 
       <main className="flex-1 overflow-y-auto pb-24">
         <form onSubmit={handleSubmit} className="space-y-6 p-4">
-          <section className="rounded-[2rem] border border-black/5 bg-white p-5 shadow-sm">
+          <section className="rounded-[2rem] border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-neutral-900">
             <div className="flex items-center gap-4">
               <AvatarChip src={profile.avatar_url} name={profile.display_name} className="h-16 w-16" fallbackClassName="text-xl" />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-lg font-extrabold text-neutral-950">{profile.display_name}</p>
-                <p className="truncate text-sm text-neutral-500">@{profile.username}</p>
+                <p className="truncate text-lg font-extrabold text-neutral-950 dark:text-neutral-50">{profile.display_name}</p>
+                <p className="truncate text-sm text-neutral-500 dark:text-neutral-400">@{profile.username}</p>
               </div>
             </div>
 
             <div className="mt-5 space-y-4">
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-neutral-700">Display name</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Display name</span>
                 <input
                   value={displayName}
                   onChange={(event) => setDisplayName(event.target.value)}
-                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm outline-none transition focus:border-brand focus:bg-white"
+                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm text-neutral-950 outline-none transition focus:border-brand focus:bg-white dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:bg-neutral-950"
                 />
               </label>
 
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-neutral-700">Username</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Username</span>
                 <input
                   value={profile.username}
                   disabled
-                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-100 px-4 text-sm text-neutral-400 outline-none"
+                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-100 px-4 text-sm text-neutral-400 outline-none dark:border-white/10 dark:bg-neutral-800 dark:text-neutral-500"
                 />
               </label>
 
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-neutral-700">Status text</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Status text</span>
                 <textarea
                   value={statusText}
                   onChange={(event) => setStatusText(event.target.value)}
-                  className="min-h-24 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm outline-none transition focus:border-brand focus:bg-white"
+                  className="min-h-24 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-950 outline-none transition focus:border-brand focus:bg-white dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:bg-neutral-950"
                 />
               </label>
 
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-neutral-700">Update avatar</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Update avatar</span>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(event) => setAvatarFile(event.target.files?.[0] ?? null)}
-                  className="w-full rounded-2xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-500"
+                  className="w-full rounded-2xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-500 dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-400"
                 />
               </label>
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-black/5 bg-white p-5 shadow-sm">
-            <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.24em] text-neutral-400">App behavior</h2>
+          <section className="rounded-[2rem] border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-neutral-900">
+            <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.24em] text-neutral-400 dark:text-neutral-500">App behavior</h2>
             <div className="space-y-4">
               <label className="flex items-center justify-between gap-4">
-                <span className="text-sm font-medium text-neutral-700">Browser notifications</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Browser notifications</span>
                 <input type="checkbox" checked={notificationsEnabled} onChange={(event) => setNotificationsEnabled(event.target.checked)} />
               </label>
               <label className="flex items-center justify-between gap-4">
-                <span className="text-sm font-medium text-neutral-700">Read receipts</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Read receipts</span>
                 <input type="checkbox" checked={readReceiptsEnabled} onChange={(event) => setReadReceiptsEnabled(event.target.checked)} />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-neutral-700">Theme</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Theme</span>
                 <select
                   value={theme}
                   onChange={(event) => setTheme(event.target.value as UserSettingsRow["theme"])}
-                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm outline-none transition focus:border-brand focus:bg-white"
+                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm text-neutral-950 outline-none transition focus:border-brand focus:bg-white dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:bg-neutral-950"
                 >
                   <option value="light">Light</option>
                   <option value="dark">Dark</option>
                 </select>
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-neutral-700">Last seen visibility</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Last seen visibility</span>
                 <select
                   value={lastSeenVisibility}
                   onChange={(event) => setLastSeenVisibility(event.target.value as UserSettingsRow["last_seen_visibility"])}
-                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm outline-none transition focus:border-brand focus:bg-white"
+                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm text-neutral-950 outline-none transition focus:border-brand focus:bg-white dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:bg-neutral-950"
                 >
                   <option value="everyone">Everyone</option>
                   <option value="matches">Matches only</option>
@@ -217,11 +219,11 @@ export function SettingsForm({ profile, settings }: SettingsFormProps) {
                 </select>
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-medium text-neutral-700">Media auto-download</span>
+                <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Media auto-download</span>
                 <select
                   value={mediaAutoDownload}
                   onChange={(event) => setMediaAutoDownload(event.target.value as UserSettingsRow["media_auto_download"])}
-                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm outline-none transition focus:border-brand focus:bg-white"
+                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 text-sm text-neutral-950 outline-none transition focus:border-brand focus:bg-white dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:bg-neutral-950"
                 >
                   <option value="always">Always</option>
                   <option value="wifi_only">Wi-Fi only</option>
@@ -244,7 +246,7 @@ export function SettingsForm({ profile, settings }: SettingsFormProps) {
             <button
               type="button"
               onClick={handleLogout}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-red-50 font-semibold text-red-600 transition hover:bg-red-100"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-red-50 font-semibold text-red-600 transition hover:bg-red-100 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/15"
             >
               <LogOut className="h-4 w-4" />
               Logout
@@ -253,7 +255,7 @@ export function SettingsForm({ profile, settings }: SettingsFormProps) {
         </form>
       </main>
 
-      <div className="sticky bottom-0 bg-white/95 backdrop-blur">
+      <div className="sticky bottom-0 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:bg-neutral-950/95">
         <BottomNav active="settings" />
       </div>
     </div>

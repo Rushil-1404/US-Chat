@@ -31,9 +31,9 @@ export function validateAttachment(file: File) {
 }
 
 export function buildAvatarPath(userId: string, filename: string) {
-  return `avatars/${userId}/${slugifyFilename(filename)}`;
+  return `${userId}/${slugifyFilename(filename)}`;
 }
 
 export function buildAttachmentPath(conversationId: string, messageId: string, filename: string) {
-  return `attachments/${conversationId}/${messageId}/${slugifyFilename(filename)}`;
+  return `${conversationId}/${messageId}/${slugifyFilename(filename)}`;
 }

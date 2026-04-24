@@ -15,20 +15,20 @@ const itemClass =
 
 export function BottomNav({ active, cloudHref = "/chats" }: BottomNavProps) {
   return (
-    <nav className="flex h-16 items-center justify-around border-t border-black/5 bg-white/90 px-2 backdrop-blur">
-      <Link href="/chats" className={cn(itemClass, active === "chats" ? "text-brand" : "text-neutral-400")}>
+    <nav className="flex h-16 items-center justify-around border-t border-black/5 bg-white/90 px-2 backdrop-blur dark:border-white/10 dark:bg-neutral-950/90">
+      <Link href="/chats" className={cn(itemClass, active === "chats" ? "text-brand" : "text-neutral-400 dark:text-neutral-500")}>
         <MessageCircle className="h-5 w-5" />
         Chats
       </Link>
-      <button type="button" className={cn(itemClass, "cursor-not-allowed text-neutral-300")}>
+      <button type="button" className={cn(itemClass, "cursor-not-allowed text-neutral-300 dark:text-neutral-700")}>
         <Phone className="h-5 w-5" />
         Calls
       </button>
-      <Link href={cloudHref} className={cn(itemClass, active === "cloud" ? "text-brand" : "text-neutral-400")}>
+      <Link href={cloudHref} className={cn(itemClass, active === "cloud" ? "text-brand" : "text-neutral-400 dark:text-neutral-500")}>
         <Cloud className="h-5 w-5" />
         Cloud
       </Link>
-      <Link href="/settings" className={cn(itemClass, active === "settings" ? "text-brand" : "text-neutral-400")}>
+      <Link href="/settings" className={cn(itemClass, active === "settings" ? "text-brand" : "text-neutral-400 dark:text-neutral-500")}>
         <Settings className="h-5 w-5" />
         Settings
       </Link>
