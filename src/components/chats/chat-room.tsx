@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { ArrowLeft, Download, LoaderCircle, LogOut, MoreVertical, Paperclip, Play, Send, Settings, Video } from "lucide-react";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { BottomNav } from "@/components/layout/bottom-nav";
@@ -23,6 +24,11 @@ type ChatRoomProps = {
 };
 
 const NEAR_BOTTOM_DISTANCE = 96;
+const KEYBOARD_OVERLAP_THRESHOLD = 80;
+
+type ChatRoomStyle = CSSProperties & {
+  "--chat-keyboard-offset": string;
+};
 
 function isScrolledNearBottom(element: Pick<HTMLDivElement, "clientHeight" | "scrollHeight" | "scrollTop">) {
   return element.scrollHeight - element.scrollTop - element.clientHeight <= NEAR_BOTTOM_DISTANCE;
@@ -58,6 +64,7 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
   const [menuOpen, setMenuOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasNewMessages, setHasNewMessages] = useState(false);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const isNearBottomRef = useRef(true);
@@ -88,6 +95,79 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
 
     run();
   }, []);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    let frameId: number | null = null;
+    let settleTimerId: number | null = null;
+
+    const measureKeyboard = () => {
+      const visibleHeight = viewport?.height ?? window.innerHeight;
+      const offsetTop = viewport?.offsetTop ?? 0;
+      const overlap = Math.max(0, window.innerHeight - visibleHeight - offsetTop);
+
+      return overlap > KEYBOARD_OVERLAP_THRESHOLD ? Math.ceil(overlap) : 0;
+    };
+
+    const syncKeyboardOffset = () => {
+      const applyOffset = () => {
+        frameId = null;
+        const nextOffset = measureKeyboard();
+
+        setKeyboardOffset((currentOffset) => (currentOffset === nextOffset ? currentOffset : nextOffset));
+
+        if (nextOffset > 0 && isNearBottomRef.current) {
+          scrollToBottom("auto");
+        }
+      };
+
+      if (typeof window.requestAnimationFrame === "function") {
+        if (frameId !== null) {
+          window.cancelAnimationFrame(frameId);
+        }
+
+        frameId = window.requestAnimationFrame(applyOffset);
+        return;
+      }
+
+      applyOffset();
+    };
+
+    const syncAfterKeyboardSettles = () => {
+      syncKeyboardOffset();
+
+      if (settleTimerId !== null) {
+        window.clearTimeout(settleTimerId);
+      }
+
+      settleTimerId = window.setTimeout(syncKeyboardOffset, 280);
+    };
+
+    syncKeyboardOffset();
+    viewport?.addEventListener("resize", syncKeyboardOffset);
+    viewport?.addEventListener("scroll", syncKeyboardOffset);
+    window.addEventListener("resize", syncKeyboardOffset);
+    window.addEventListener("orientationchange", syncAfterKeyboardSettles);
+    window.addEventListener("focusin", syncAfterKeyboardSettles);
+    window.addEventListener("focusout", syncAfterKeyboardSettles);
+
+    return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      if (settleTimerId !== null) {
+        window.clearTimeout(settleTimerId);
+      }
+
+      viewport?.removeEventListener("resize", syncKeyboardOffset);
+      viewport?.removeEventListener("scroll", syncKeyboardOffset);
+      window.removeEventListener("resize", syncKeyboardOffset);
+      window.removeEventListener("orientationchange", syncAfterKeyboardSettles);
+      window.removeEventListener("focusin", syncAfterKeyboardSettles);
+      window.removeEventListener("focusout", syncAfterKeyboardSettles);
+    };
+  }, [scrollToBottom]);
 
   useEffect(() => {
     const latestMessage = messages[messages.length - 1];
@@ -321,8 +401,15 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
     }
   }
 
+  const chatRoomStyle: ChatRoomStyle = {
+    "--chat-keyboard-offset": `${keyboardOffset}px`,
+  };
+
   return (
-    <div className="relative flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-[linear-gradient(180deg,#f5f0e7_0%,#faf8f3_22%,#ffffff_100%)] dark:bg-[linear-gradient(180deg,#111a16_0%,#0d1411_42%,#090d0c_100%)]">
+    <div
+      style={chatRoomStyle}
+      className="relative flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-[linear-gradient(180deg,#f5f0e7_0%,#faf8f3_22%,#ffffff_100%)] dark:bg-[linear-gradient(180deg,#111a16_0%,#0d1411_42%,#090d0c_100%)]"
+    >
       <header className="z-20 shrink-0 border-b border-black/5 bg-white/95 px-4 pb-3 pt-[calc(2.5rem+env(safe-area-inset-top))] backdrop-blur dark:border-white/10 dark:bg-neutral-950/95">
         <div className="flex items-center justify-between gap-4">
           <Link href="/chats" className="flex min-w-0 items-center gap-3">
@@ -375,6 +462,7 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
         ref={listRef}
         data-testid="message-list"
         onScroll={handleListScroll}
+        style={{ paddingBottom: `calc(1.25rem + var(--chat-keyboard-offset))` }}
         className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 py-5"
       >
         {messages.map((message) => (
@@ -458,13 +546,18 @@ export function ChatRoom({ conversation, currentUserId, partner, initialMessages
             setHasNewMessages(false);
             scrollToBottom("smooth");
           }}
-          className="absolute bottom-[calc(8rem+env(safe-area-inset-bottom))] left-1/2 z-20 -translate-x-1/2 rounded-full bg-neutral-950 px-4 py-2 text-xs font-bold text-white shadow-float transition hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200"
+          style={{ bottom: "calc(8rem + env(safe-area-inset-bottom) + var(--chat-keyboard-offset))" }}
+          className="absolute left-1/2 z-20 -translate-x-1/2 rounded-full bg-neutral-950 px-4 py-2 text-xs font-bold text-white shadow-float transition hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200"
         >
           New messages
         </button>
       ) : null}
 
-      <footer className="z-20 shrink-0 border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-white/10 dark:bg-neutral-950/95">
+      <footer
+        data-testid="chat-composer"
+        style={{ transform: keyboardOffset > 0 ? `translate3d(0, -${keyboardOffset}px, 0)` : "translate3d(0, 0, 0)" }}
+        className="z-20 shrink-0 border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur transition-transform duration-200 ease-out will-change-transform dark:border-white/10 dark:bg-neutral-950/95"
+      >
         {uploadLabel ? <p className="px-4 pt-3 text-xs font-medium text-neutral-500 dark:text-neutral-400">{uploadLabel}</p> : null}
         {error ? <p className="px-4 pt-3 text-xs font-medium text-red-600">{error}</p> : null}
         <form onSubmit={sendTextMessage} className="flex items-end gap-2 px-3 py-3">

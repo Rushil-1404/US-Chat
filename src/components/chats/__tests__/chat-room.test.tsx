@@ -134,16 +134,60 @@ async function pushRealtimeMessage(message: MessageRow) {
   });
 }
 
+function installVisualViewportMock({ height = 800, offsetTop = 0 } = {}) {
+  let currentHeight = height;
+  let currentOffsetTop = offsetTop;
+  const viewport = new EventTarget() as VisualViewport;
+
+  Object.defineProperties(viewport, {
+    height: {
+      configurable: true,
+      get: () => currentHeight,
+    },
+    offsetTop: {
+      configurable: true,
+      get: () => currentOffsetTop,
+    },
+  });
+  Object.defineProperty(window, "visualViewport", {
+    configurable: true,
+    value: viewport,
+  });
+
+  return {
+    setHeight(nextHeight: number) {
+      currentHeight = nextHeight;
+      viewport.dispatchEvent(new Event("resize"));
+    },
+    setOffsetTop(nextOffsetTop: number) {
+      currentOffsetTop = nextOffsetTop;
+      viewport.dispatchEvent(new Event("scroll"));
+    },
+  };
+}
+
 describe("ChatRoom scrolling", () => {
   let originalRequestAnimationFrame: typeof window.requestAnimationFrame;
+  let originalInnerHeight: number;
+  let originalVisualViewport: VisualViewport | null;
   let scrollToMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     originalRequestAnimationFrame = window.requestAnimationFrame;
+    originalInnerHeight = window.innerHeight;
+    originalVisualViewport = window.visualViewport;
     window.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
       return 1;
     }) as typeof window.requestAnimationFrame;
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: 800,
+    });
+    Object.defineProperty(window, "visualViewport", {
+      configurable: true,
+      value: null,
+    });
 
     scrollToMock = vi.fn(function scrollTo(this: HTMLElement, options?: ScrollToOptions | number, y?: number) {
       if (typeof options === "object" && options) {
@@ -185,6 +229,14 @@ describe("ChatRoom scrolling", () => {
 
   afterEach(() => {
     window.requestAnimationFrame = originalRequestAnimationFrame;
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: originalInnerHeight,
+    });
+    Object.defineProperty(window, "visualViewport", {
+      configurable: true,
+      value: originalVisualViewport,
+    });
     cleanup();
   });
 
@@ -255,5 +307,32 @@ describe("ChatRoom scrolling", () => {
 
     expect(screen.queryByRole("button", { name: /new messages/i })).not.toBeInTheDocument();
     expect(scrollToMock).toHaveBeenLastCalledWith({ top: 1000, behavior: "smooth" });
+  });
+
+  it("moves the composer above the mobile keyboard and restores it after close", async () => {
+    const viewport = installVisualViewportMock({ height: 800 });
+    renderRoom();
+    const composer = screen.getByTestId("chat-composer");
+    const room = composer.parentElement as HTMLElement;
+
+    expect(composer).toHaveStyle("transform: translate3d(0, 0, 0)");
+
+    act(() => {
+      viewport.setHeight(470);
+    });
+
+    await waitFor(() => {
+      expect(room.style.getPropertyValue("--chat-keyboard-offset")).toBe("330px");
+    });
+    expect(composer).toHaveStyle("transform: translate3d(0, -330px, 0)");
+
+    act(() => {
+      viewport.setHeight(800);
+    });
+
+    await waitFor(() => {
+      expect(room.style.getPropertyValue("--chat-keyboard-offset")).toBe("0px");
+    });
+    expect(composer).toHaveStyle("transform: translate3d(0, 0, 0)");
   });
 });
